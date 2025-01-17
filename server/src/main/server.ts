@@ -8,11 +8,15 @@ import { errorHandler } from '../interface/middleware/ErrorHandler';
 import imageRouter from '../interface/routes/imageRoutes';
 import cookieParser from 'cookie-parser';
 import path from 'path';
+import dotenv from 'dotenv'
 
 const app = express()
 const port = config.app.PORT;
 app.use('/uploads', express.static(path.join(__dirname, '../../uploads')));
 
+app.use(express.json())
+dotenv.config()
+app.use(cookieParser())
 //middlewares
 app.use(cors({
     origin: config.cors.CLIENT_URL,
@@ -23,7 +27,8 @@ app.use(cors({
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}))
-app.use(cookieParser())
+
+
 
 app.get('/', (req:Request, res:Response, next: NextFunction) => {
     res.status(200).json({success: true, message : 'API is working'})
@@ -31,6 +36,15 @@ app.get('/', (req:Request, res:Response, next: NextFunction) => {
 
 app.use('/api/users', userRouter)
 app.use('/api/users/images', imageRouter)
+
+
+//unknown routes 
+app.all('*', (req: Request, res: Response, next : NextFunction) => {
+    const err = new Error(`Route ${req.originalUrl} not found`) as any;
+    err.statusCode = 404;
+    next(err)
+})
+
 
 app.use(errorHandler)
 
