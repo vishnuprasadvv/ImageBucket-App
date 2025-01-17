@@ -1,5 +1,4 @@
 import { getImages } from '@/api/imageApi'
-import ImageEditModal from '@/components/ImageEditModal'
 import ImageList from '@/components/ImageList'
 import ImageUpload from '@/components/ImageUpload'
 import React, { useEffect, useState } from 'react'
@@ -11,7 +10,6 @@ interface Image {
 }
 const Dashboard:React.FC = () => {
     const [images, setImages] = useState<Image[]>([])
-    const [selectedImage, setSelectedImage] = useState<Image | null>(null)
 
     const fetchImages = async() => {
         try {
@@ -30,17 +28,12 @@ const Dashboard:React.FC = () => {
 
   return (
     <div className='space-y-5'>
-        <ImageUpload onUploadSuccess={fetchImages} />
+        <ImageUpload onUploadSuccess={fetchImages} existingImages={images.map((image) => ({order: image.order}))} />
         <ImageList 
         images={images}
         onDeleteSuccess={fetchImages}
-        onEdit={setSelectedImage}
         onRearrangeSuccess={(fetchImages)}
          />
-         <ImageEditModal 
-         image={selectedImage}
-         onClose={() => setSelectedImage(null)}
-         onSaveSuccess={fetchImages}/>
     </div>
   )
 }

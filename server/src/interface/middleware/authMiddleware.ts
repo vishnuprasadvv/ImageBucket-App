@@ -9,11 +9,6 @@ export const isAuthenticated = async (req:Request, res:Response, next: NextFunct
     // const refreshToken = req.cookies?.refreshToken;
     console.log('accesstoken', accessToken)
 
-    // if(!accessToken && !refreshToken) {
-    //     res.status(401).json({message: 'accessToken and refreshToken not found'})
-    //     console.error('access and refresh token not found')
-    //     return;
-    // } 
 
     if(!accessToken) {
         res.status(401).json({message: 'accessToken expired'})
@@ -37,6 +32,7 @@ export const isAuthenticated = async (req:Request, res:Response, next: NextFunct
             id: user._id.toString()
         }
         next();
+        
     } catch (error) {
 
         console.log('isAuthenticated error', error)

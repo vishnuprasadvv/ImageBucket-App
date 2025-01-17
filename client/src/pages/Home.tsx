@@ -29,8 +29,10 @@ const Home: React.FC = () => {
       
     }
   return (
-    <div>
-      <div className="min-w-screen m-0 bg-blue-50 h-16  flex items-center justify-end">
+    <div className="bg-gray-100 ">
+      <div className="max-w-7xl w-full place-self-center">
+      <div className="min-w-screen m-0 bg-indigo-100 h-16  flex items-center justify-between mb-2">
+        <h1 className="text-2xl font-bold text-indigo-700 pl-2">ImageBucket</h1>
         <div className="flex items-center gap-4">
           <div>
             <span>Hi, {user?.email} </span>
@@ -53,9 +55,10 @@ const Home: React.FC = () => {
         </div>
       </div>
       <div>
-        <h1>Home</h1>
         <Dashboard />
       </div>
+      </div>
+      
     </div>
   );
 };

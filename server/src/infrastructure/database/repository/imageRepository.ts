@@ -11,12 +11,15 @@ export class ImageRepository implements IImageRepository{
             _id : image._id.toString(),
             userId: image.userId.toString(),
         }))
-        
     }
 
     async addImage(image: Image): Promise<Image> {
-        const newImage = new ImageModel(image);
-        const uploaded = await newImage.save();
+        const highestOrderImage = await ImageModel.findOne().sort({ order: -1 }).exec();
+    const newOrder = highestOrderImage ? highestOrderImage.order + 1 : 1; 
+
+    // Create a new image with the calculated order
+    const newImage = new ImageModel({ ...image, order: newOrder });
+    const uploaded = await newImage.save();
         return {...uploaded, _id: uploaded._id.toString(), userId: uploaded.userId.toString()}
     }
     async getImageById(id: string): Promise<Image | null> {

@@ -42,7 +42,6 @@ export const addImageController = async (
 ) => {
   try {
 
-    
     const { id } = req.user!;
     if (!id) throw new Error("User ID is required");
 
@@ -51,7 +50,7 @@ export const addImageController = async (
       throw new Error('No files uploaded')
     }
 
-    const {titles} = req.body
+    const {titles, } = req.body
     console.log('titels', titles)
     console.log(files)
     if(!titles || !Array.isArray(titles) || titles.length !== files.length) {
