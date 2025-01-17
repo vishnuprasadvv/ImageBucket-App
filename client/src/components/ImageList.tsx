@@ -17,6 +17,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Card } from "./ui/card";
 import { PencilIcon, Trash2 } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog";
 
 interface Props {
   images: Image[];
@@ -117,7 +118,7 @@ const ImageList: React.FC<Props> = ({ images, onDeleteSuccess }) => {
                 src={`${config.app.BASE_URL}${image.url}`}
                 alt="image"
                 width={68}
-                className="h-max"
+                className="h-max cursor-pointer"
                 onClick={() => setViewImage(image)}
               />
 
@@ -166,13 +167,34 @@ const ImageList: React.FC<Props> = ({ images, onDeleteSuccess }) => {
                   </DialogContent>
                 </Dialog>
 
-                <Button
-                  size="icon"
-                  className="bg-red-400 w-full hover:bg-red-500 aspect-square text-white"
-                  onClick={() => handleDelete(image._id)}
-                >
-                  <Trash2 size={15} />
-                </Button>
+                
+
+
+                <AlertDialog>
+      <AlertDialogTrigger asChild 
+      >
+        <div className="bg-red-400 w-full hover:bg-red-500  rounded-md aspect-square  text-white p-3">
+          <Trash2 size={15} />
+        </div>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+          <AlertDialogDescription>
+            This action cannot be undone. This will permanently delete your
+            account and remove your data from our servers.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction  onClick={() => handleDelete(image._id)} 
+            className="bg-indigo-500 hover:bg-indigo-400"
+            >Continue</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+
+
               </div>
             </Card>
           </Reorder.Item>
