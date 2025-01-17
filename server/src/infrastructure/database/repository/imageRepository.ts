@@ -5,7 +5,7 @@ import { ImageModel } from "../models/ImageModel";
 
 export class ImageRepository implements IImageRepository{
     async getImagesByUser(userId: string): Promise<Image[]> {
-        const data = await ImageModel.find({userId}).sort('order')
+        const data = await ImageModel.find({userId}).sort('-order')
         return data.map((image) => ({
             ...image.toObject(), 
             _id : image._id.toString(),

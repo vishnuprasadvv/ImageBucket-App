@@ -39,6 +39,8 @@ const ImageList: React.FC<Props> = ({ images, onDeleteSuccess }) => {
   const [selectedImage, setSelectedImage] = useState<Image | null>(null);
   const [title, setTitle] = useState("");
   const [newImageFile, setNewImageFile] = useState<File | null>(null);
+  const [viewImage, setViewImage] = useState<Image | null>(null);
+
 
   useEffect(() => {
     setImageList(images);
@@ -106,14 +108,17 @@ const ImageList: React.FC<Props> = ({ images, onDeleteSuccess }) => {
         Your images
       </h3>
       <Reorder.Group values={imageList} onReorder={handleReorder}>
-        {imageList.map((image) => (
+        {imageList.map((image) =>{
+        return (
           <Reorder.Item value={image} key={image._id}>
             <Card className="bg-slate-50 hover:bg-slate-100 w-full mb-2 flex gap-5 min-h-24 items-center px-2">
+          
               <img
                 src={`${config.app.BASE_URL}${image.url}`}
                 alt="image"
                 width={68}
                 className="h-max"
+                onClick={() => setViewImage(image)}
               />
 
               <p className="font-semibold">{image.title}</p>
@@ -171,8 +176,37 @@ const ImageList: React.FC<Props> = ({ images, onDeleteSuccess }) => {
               </div>
             </Card>
           </Reorder.Item>
-        ))}
+        )})}
       </Reorder.Group>
+
+
+      {viewImage && (
+        <Dialog open={!!viewImage} onOpenChange={() => setViewImage(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{viewImage.title}</DialogTitle>
+            </DialogHeader>
+            <img
+              src={`${config.app.BASE_URL}${viewImage.url}`}
+              alt={viewImage.title}
+              className="w-full h-auto rounded-md"
+            />
+            <DialogFooter>
+              <DialogClose>
+                <Button
+                  onClick={() => setViewImage(null)}
+                  className="bg-indigo-500 hover:bg-indigo-400"
+                >
+                  Close
+                </Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+
+
+
     </div>
   );
 };

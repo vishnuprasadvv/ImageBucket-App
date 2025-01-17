@@ -48,7 +48,6 @@ const Home: React.FC = () => {
               </div>
             </PopoverTrigger>
             <PopoverContent>
-                <div className="hover:bg-slate-100 p-2 hover:cursor-pointer" onClick={()=> navigate('/home/reset-password')}>Reset password</div>
                 <div className="text-red-500 hover:bg-slate-100 hover:cursor-pointer p-2" onClick={handleLogout}>Logout</div>
             </PopoverContent>
           </Popover>
