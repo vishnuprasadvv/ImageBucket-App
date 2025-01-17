@@ -104,7 +104,7 @@ const ImageList: React.FC<Props> = ({ images, onDeleteSuccess }) => {
   };
 
   return (
-    <div className="bg-slate-200 p-2 flex flex-col w-full h-screen rounded-md">
+    <div className="bg-slate-200 p-2 flex flex-col w-full min-h-screen rounded-md">
       <h3 className="text-center font-bold text-xl pb-4 text-indigo-500">
         Your images
       </h3>
