@@ -4,6 +4,10 @@ export class UserUseCases {
     constructor(private userRepository : IUserRepository){}
 
     async registerUser (email : string, phone : string, password: string) {
+        const userExists = await this.userRepository.findByEmail(email);
+        if(userExists){
+            throw new Error('User already exist with this email')
+        }
         return this.userRepository.createUser(email, phone, password)
     }
 
