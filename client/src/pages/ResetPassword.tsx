@@ -35,7 +35,6 @@ const ResetPassword:React.FC = () => {
     })
 
     const onSubmit = async(data: formData) => {
-      console.log('hit')
       if(!email){
         toast.error('Please provide email detail first')
         return;

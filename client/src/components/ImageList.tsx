@@ -25,7 +25,6 @@ interface Props {
 }
 
 const ImageList: React.FC<Props> = ({ images, onDeleteSuccess }) => {
-  console.log("imagelist", images);
 
   const handleDelete = async (id: string) => {
     try {
@@ -37,8 +36,10 @@ const ImageList: React.FC<Props> = ({ images, onDeleteSuccess }) => {
   };
 
   const [imageList, setImageList] = useState<Image[]>(images);
-  const [selectedImage, setSelectedImage] = useState<Image | null>(null)
+  const [selectedImage, setSelectedImage] = useState<Image | null>(null);
   const [title, setTitle] = useState("");
+  const [newImageFile, setNewImageFile] = useState<File | null>(null);
+
   useEffect(() => {
     setImageList(images);
   }, [images]);
@@ -49,26 +50,40 @@ const ImageList: React.FC<Props> = ({ images, onDeleteSuccess }) => {
 
   const handleSave = async (imageId: string) => {
     if (!selectedImage) return;
+
     try {
-      await editImage(imageId, { title });
+      const response = await editImage(imageId, {
+        title,
+        imageFile: newImageFile,
+      });
       setSelectedImage(null);
+     
       setImageList((prevList) =>
         prevList.map((image) =>
-          image._id === imageId ? { ...image, title } : image
+          image._id === imageId
+            ? {
+                ...image,
+                title,
+                url: newImageFile ? response.data.url : image.url,
+              }
+            : image
         )
       );
+      setNewImageFile(null); // Reset the image file input
     } catch (error) {
       console.error("Error editing image", error);
     }
   };
 
-
-
   if (!images) {
     return <div>Loading images...</div>;
   }
-  if(images.length === 0){
-    return <div className=" h-screen text-center font-bold text-slate-500">NO IMAGES</div>
+  if (images.length === 0) {
+    return (
+      <div className=" h-screen text-center font-bold text-slate-500">
+        NO IMAGES
+      </div>
+    );
   }
 
   const handleReorder = async (reorderedList: Image[]) => {
@@ -80,8 +95,6 @@ const ImageList: React.FC<Props> = ({ images, onDeleteSuccess }) => {
 
     try {
       await reorderImages(updatedList);
-      console.log("fkdsjf", updatedList);
-      console.log("reorder saved to DB");
     } catch (error) {
       console.error("Error saving reorder to db", error);
     }
@@ -89,7 +102,9 @@ const ImageList: React.FC<Props> = ({ images, onDeleteSuccess }) => {
 
   return (
     <div className="bg-slate-200 p-2 flex flex-col w-full h-screen rounded-md">
-      <h3 className="text-center font-bold text-xl pb-4 text-indigo-500">Your images</h3>
+      <h3 className="text-center font-bold text-xl pb-4 text-indigo-500">
+        Your images
+      </h3>
       <Reorder.Group values={imageList} onReorder={handleReorder}>
         {imageList.map((image) => (
           <Reorder.Item value={image} key={image._id}>
@@ -105,8 +120,10 @@ const ImageList: React.FC<Props> = ({ images, onDeleteSuccess }) => {
 
               <div className="flex ml-auto gap-1">
                 <Dialog>
-                  <DialogTrigger className="bg-indigo-400 w-full hover:bg-indigo-500 p-3 rounded-md aspect-square  text-white" 
-                  onClick={() => setSelectedImage(image)}>
+                  <DialogTrigger
+                    className="bg-indigo-400 w-full hover:bg-indigo-500 p-3 rounded-md aspect-square  text-white"
+                    onClick={() => setSelectedImage(image)}
+                  >
                     <PencilIcon size={15} />
                   </DialogTrigger>
                   <DialogContent>
@@ -120,23 +137,36 @@ const ImageList: React.FC<Props> = ({ images, onDeleteSuccess }) => {
                           value={title}
                           onChange={(e) => setTitle(e.target.value)}
                         />
+
+                        <Input
+                          type="file"
+                          className="mt-2"
+                          accept="image/*"
+                          onChange={(e) =>
+                            setNewImageFile(e.target.files?.[0] || null)
+                          }
+                        />
                       </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
                       <DialogClose>
-                      <Button onClick={() => handleSave(image._id)} className="bg-indigo-500 hover:bg-indigo-400">
-                        Save changes
-                      </Button>
+                        <Button
+                          onClick={() => handleSave(image._id)}
+                          className="bg-indigo-500 hover:bg-indigo-400"
+                        >
+                          Save changes
+                        </Button>
                       </DialogClose>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
 
-                <Button size='icon'
+                <Button
+                  size="icon"
                   className="bg-red-400 w-full hover:bg-red-500 aspect-square text-white"
                   onClick={() => handleDelete(image._id)}
                 >
-                  <Trash2 size={15}/>
+                  <Trash2 size={15} />
                 </Button>
               </div>
             </Card>

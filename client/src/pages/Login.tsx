@@ -42,7 +42,6 @@ const Login:React.FC = () => {
         try {
             const response = await loginUserApi(email, password)
             toast.success(response.message || 'Login successful.')
-            console.log(response)
             dispatch(loggedIn({user: response.data.user}))
             navigate('/')
         } catch (error:any) {

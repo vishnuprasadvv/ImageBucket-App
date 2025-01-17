@@ -58,8 +58,6 @@ const ImageUpload: React.FC<Props> = ({ onUploadSuccess, existingImages }) => {
       formData.append("orders[]", String(order));
     });
 
-    console.log("formdata", files, titles);
-
     try {
       await uploadImages(formData);
       setFiles([]);

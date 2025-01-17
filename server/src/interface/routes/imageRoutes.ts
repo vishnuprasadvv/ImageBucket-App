@@ -8,7 +8,7 @@ const router = Router();
 router.get('/', isAuthenticated, getImagesController)
 router.post('/upload', isAuthenticated, upload.array('images'), addImageController)
 router.delete('/:id', isAuthenticated, deleteImageController)
-router.put('/:id', isAuthenticated, editImageController)
+router.put('/:id', isAuthenticated,upload.single('image'), editImageController)
 router.post('/reorder', isAuthenticated, changeOrderController)
 
 

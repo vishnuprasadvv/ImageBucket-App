@@ -14,7 +14,6 @@ const Dashboard:React.FC = () => {
     const fetchImages = async() => {
         try {
             const response = await getImages();
-            console.log(response)
             setImages(response.data)
         } catch (error) {
             console.error('Error fetching images', error)

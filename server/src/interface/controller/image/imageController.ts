@@ -127,6 +127,7 @@ export const changeOrderController = async (
     next(error);
   }
 };
+
 export const editImageController = async (
   req: Request,
   res: Response,
@@ -135,20 +136,36 @@ export const editImageController = async (
   try {
     const { id } = req.params;
     if (!id) throw new Error("Image ID is required");
-   
-    const image = req.body;
-    console.log(image)
-    const useCase = new EditImageUseCase(imageRepository)
-    const updatedImage = await useCase.execute(id, image)
-    if(!updatedImage){
-      throw new Error("Error editing image")
+
+    // Extract the title and image file from the request
+    const title = req.body.title;
+    const imageFile = req.file; // multer adds file info to req.file
+
+    // If title or file is missing, throw an error
+    if (!title && !imageFile) {
+      throw new Error("At least title or image must be provided");
     }
-    
+
+    // Log the received data (for debugging)
+    console.log("Received data:", { title, imageFile });
+    let fileUrl = undefined;
+    if(imageFile){
+      fileUrl= `/uploads/${imageFile.filename}`
+    }
+
+    const useCase = new EditImageUseCase(imageRepository);
+    const updatedImage = await useCase.execute(id, { title, url:fileUrl });
+
+    if (!updatedImage) {
+      throw new Error("Error editing image");
+    }
+console.log(updatedImage)
+    // Send response back to client
     ResponseHandler.sendResponse(
       res,
       HttpStatusCode.OK,
       true,
-      "Image deleted successfully",
+      "Image edited successfully",
       updatedImage
     );
   } catch (error) {

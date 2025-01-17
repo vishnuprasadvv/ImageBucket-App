@@ -21,12 +21,33 @@ export const getImages = async() => {
     return response.data;
 }
 
-export const editImage = (id: string, data: { title?: string; url?: string }) => {
-    return api.put(`${API_URL}/api/users/images/${id}`, data);
+export const editImage = async(id: string, data: { title?: string; imageFile?: File | null }) => {
+
+    const formData = new FormData();
+    if(data.title){
+        formData.append('title', data.title)
+    }
+    if(data.imageFile){
+        formData.append('image', data.imageFile);
+    }
+    try {
+        const response = await api.put(
+          `${API_URL}/api/users/images/${id}`,
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          }
+        );
+        return response.data;
+      } catch (error) {
+        console.error("Error updating image:", error);
+        throw error;
+      }
   };
 
 export const reorderImages = async(reorderedImages : Image[]) => {
-    console.log('reorder api', reorderedImages)
     const response = await api.post(`${API_URL}/api/users/images/reorder`, {reorderedImages});
     return response.data;
   };
