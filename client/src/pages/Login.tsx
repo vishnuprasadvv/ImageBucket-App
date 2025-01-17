@@ -53,9 +53,8 @@ const Login:React.FC = () => {
   return (
     <div className="h-screen flex items-center justify-center text-slate-800 max-w-screen">
     <div className="bg-slate-100 p-4 flex flex-col gap-4 w-full sm:w-1/2 lg:w-1/3">
-      <div>
-        <h3 className="text-xl font-bold">Login</h3>
-      </div>
+      
+        <h3 className="text-xl text-indigo-500 font-bold text-center ">Login</h3>
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col gap-3 w-full"

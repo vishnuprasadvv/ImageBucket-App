@@ -60,7 +60,7 @@ const Signup: React.FC = () => {
     <div className="h-screen flex items-center justify-center text-slate-800 max-w-screen">
       <div className="bg-slate-100 p-4 flex flex-col gap-4 w-full sm:w-1/2 lg:w-1/3">
         <div>
-          <h3 className="text-xl font-bold">Sign up</h3>
+          <h3 className="text-xl font-bold text-indigo-500 text-center">Sign up</h3>
         </div>
         <form
           onSubmit={handleSubmit(onSubmit)}
