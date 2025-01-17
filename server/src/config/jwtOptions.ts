@@ -20,8 +20,8 @@ export const accessTokenOptions : ITokenOptions  = {
 }
 
 export const refreshTokenOptions : ITokenOptions  = {
-    expires: new Date(Date.now() + refreshTokenExpire * 60 * 60 * 1000),
-    maxAge: refreshTokenExpire * 60 * 60 * 1000,
+    expires: new Date(Date.now() + refreshTokenExpire * 24 * 60 * 60 * 1000),
+    maxAge: refreshTokenExpire *24 * 60 * 60 * 1000,
     httpOnly: true,
     sameSite: config.app.ENVIRONMENT === 'production' ? 'none' : 'strict',
     secure: config.app.ENVIRONMENT === 'production'

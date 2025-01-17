@@ -5,6 +5,9 @@ export class UpdateOrderUseCase {
     constructor(private imageRepository: IImageRepository){}
 
     async execute(images: Image[]):Promise<void> {
-        await this.imageRepository.updateOrder(images)
+        if(!images || images.length === 0) {
+            throw new Error('No images provided for reordering')
+        }
+        await this.imageRepository.updateOrder(images);
     }
 }

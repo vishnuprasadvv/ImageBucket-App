@@ -5,7 +5,7 @@ const ACCESS_TOKEN_SECRET = config.jwt.ACCESS_TOKEN_SECRET;
 const REFRESH_TOKEN_SECRET = config.jwt.REFRESH_TOKEN_SECRET;
 
 export const generateAccessToken = (payload: {id: string}):string => {
-    const access = jwt.sign(payload, ACCESS_TOKEN_SECRET, {expiresIn:'15m'});
+    const access = jwt.sign(payload, ACCESS_TOKEN_SECRET, {expiresIn:'1d'});
     return access;
 }
 

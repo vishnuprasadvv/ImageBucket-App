@@ -6,6 +6,8 @@ import { HttpStatusCode } from "../../../enums/HttpStatusCode";
 import { Messages } from "../../../constants/Messages";
 import { AddImageUseCase } from "../../../application/use-cases/image/addImageUseCase";
 import { DeleteImageUseCase } from "../../../application/use-cases/image/deleteImageUseCase";
+import { EditImageUseCase } from "../../../application/use-cases/image/editImageUseCase";
+import { UpdateOrderUseCase } from "../../../application/use-cases/image/updateOrderUseCase";
 
 const imageRepository = new ImageRepository();
 export const getImagesController = async (
@@ -93,13 +95,12 @@ export const deleteImageController = async (
     if (!id) throw new Error("User ID is required");
     const imageId = req.params.id
     const useCase = new DeleteImageUseCase(imageRepository);
-    const userImages = await useCase.execute(imageId);
+    await useCase.execute(imageId);
     ResponseHandler.sendResponse(
       res,
       HttpStatusCode.OK,
       true,
       "Image deleted successfully",
-      userImages
     );
   } catch (error) {
     next(error);
@@ -111,18 +112,46 @@ export const changeOrderController = async (
   res: Response,
   next: NextFunction
 ) => {
+  const {reorderedImages} = req.body;
+  console.log('test')
+  console.log('reorder', reorderedImages)
   try {
-    const { id } = req.user!;
-    if (!id) throw new Error("User ID is required");
-   
     
-    // ResponseHandler.sendResponse(
-    //   res,
-    //   HttpStatusCode.OK,
-    //   true,
-    //   "Image deleted successfully",
-    //   userImages
-    // );
+    if (!reorderedImages || !Array.isArray(reorderedImages)) {
+       res.status(400).json({ message: "Invalid input data" });
+  }
+ 
+   const useCase = new UpdateOrderUseCase(imageRepository)
+   await useCase.execute(reorderedImages)
+    ResponseHandler.sendResponse(res, HttpStatusCode.OK, true, 'Image reordered')
+  } catch (error) {
+    next(error);
+  }
+};
+export const editImageController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    if (!id) throw new Error("Image ID is required");
+   
+    const image = req.body;
+    console.log(image)
+    const useCase = new EditImageUseCase(imageRepository)
+    const updatedImage = await useCase.execute(id, image)
+    if(!updatedImage){
+      throw new Error("Error editing image")
+    }
+    
+    ResponseHandler.sendResponse(
+      res,
+      HttpStatusCode.OK,
+      true,
+      "Image deleted successfully",
+      updatedImage
+    );
   } catch (error) {
     next(error);
   }

@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { IImageRepository } from "../../../application/interfaces/IImageRepository";
 import { Image } from "../../../domain/entities/Image";
 import { ImageModel } from "../models/ImageModel";
@@ -18,6 +19,9 @@ export class ImageRepository implements IImageRepository{
         const uploaded = await newImage.save();
         return {...uploaded, _id: uploaded._id.toString(), userId: uploaded.userId.toString()}
     }
+    async getImageById(id: string): Promise<Image | null> {
+        return await ImageModel.findById(id)
+    }
 
     async deleteImage(id: string): Promise<void> {
         await ImageModel.findByIdAndDelete(id)
@@ -30,7 +34,7 @@ export class ImageRepository implements IImageRepository{
     async updateOrder(images: Image[]): Promise<void> {
         const bulkOperations = images.map((image) => ({
             updateOne: {
-                filter: { _id: image._id},
+                filter: { _id: new mongoose.Types.ObjectId(image._id) },
                 update: { order: image.order}
             },
         }));
