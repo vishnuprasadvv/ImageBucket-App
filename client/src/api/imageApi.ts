@@ -21,6 +21,11 @@ export const getImages = async() => {
     return response.data;
 }
 
+export const getFilteredData = async(searchInput : string, sort: string, page: number, limit: number) => {
+    const response = await api.get(`${API_URL}/api/users/images/filtered`, {params:{searchInput, sort, page, limit}});
+    return response.data;
+}
+
 export const editImage = async(id: string, data: { title?: string; imageFile?: File | null }) => {
 
     const formData = new FormData();

@@ -18,34 +18,34 @@ import { Input } from "./ui/input";
 import { Card } from "./ui/card";
 import { PencilIcon, Trash2 } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog";
+import PaginationComponent from "./PaginationComponent";
+import toast from "react-hot-toast";
 
 interface Props {
-  images: Image[];
-  onDeleteSuccess: () => void;
-  onRearrangeSuccess: () => void;
+  images: Image[],
+  setImages: React.Dispatch<React.SetStateAction<Image[]>>,
+  setSearchInput: React.Dispatch<React.SetStateAction<string>>,
+  setSort: React.Dispatch<React.SetStateAction<string>>,
+  setCurrentPage : React.Dispatch<React.SetStateAction<number>>,
+  currentPage:number,
+  totalPages  : number,
+  sort : string
 }
 
-const ImageList: React.FC<Props> = ({ images, onDeleteSuccess }) => {
+const ImageList: React.FC<Props> = ({setSearchInput, setSort , sort, images, setImages, currentPage, totalPages, setCurrentPage  }) => {
 
   const handleDelete = async (id: string) => {
     try {
       await deleteImage(id);
-      onDeleteSuccess();
+      setImages((prev) => prev.filter( item => item._id !== id))
     } catch (error) {
       console.error("Error deleting image", error);
     }
   };
-
-  const [imageList, setImageList] = useState<Image[]>(images);
   const [selectedImage, setSelectedImage] = useState<Image | null>(null);
   const [title, setTitle] = useState("");
   const [newImageFile, setNewImageFile] = useState<File | null>(null);
   const [viewImage, setViewImage] = useState<Image | null>(null);
-
-
-  useEffect(() => {
-    setImageList(images);
-  }, [images]);
 
   useEffect(() => {
     setTitle(selectedImage?.title || "");
@@ -61,7 +61,7 @@ const ImageList: React.FC<Props> = ({ images, onDeleteSuccess }) => {
       });
       setSelectedImage(null);
      
-      setImageList((prevList) =>
+      setImages((prevList) =>
         prevList.map((image) =>
           image._id === imageId
             ? {
@@ -90,11 +90,15 @@ const ImageList: React.FC<Props> = ({ images, onDeleteSuccess }) => {
   }
 
   const handleReorder = async (reorderedList: Image[]) => {
+    if(sort !=='default') {
+      toast.error('Please change to "default" sort method')
+      return;
+    }
     const updatedList = reorderedList.map((image, index) => ({
       ...image,
       order: index + 1,
     }));
-    setImageList(updatedList);
+    setImages(updatedList);
 
     try {
       await reorderImages(updatedList);
@@ -103,13 +107,32 @@ const ImageList: React.FC<Props> = ({ images, onDeleteSuccess }) => {
     }
   };
 
+  const handleSearch = async () => {
+
+  }
+
   return (
     <div className="bg-slate-200 p-2 flex flex-col w-full min-h-screen rounded-md">
       <h3 className="text-center font-bold text-xl pb-4 text-indigo-500">
         Your images
       </h3>
-      <Reorder.Group values={imageList} onReorder={handleReorder}>
-        {imageList.map((image) =>{
+      <div className="flex flex-col md:flex-row justify-between px-2 items-center mb-2">
+      <div className="flex w-full h-10 my-2 md:pr-6">
+        <input type="text" placeholder="Search images" onChange={(e) => setSearchInput(e.target.value)}  className="w-full rounded-l-md px-3"/>
+        <button className="bg-indigo-400 hover:bg-indigo-500 text-white px-10 rounded-r-md " onClick={handleSearch}>Search</button>
+      </div>
+      <div className="flex h-8 md:h-10 items-center pl-6 place-self-end md:place-self-center gap-2">
+        <label htmlFor="sort" className="font-semibold text-gray-500">Sort: </label>
+        <select onChange={(e) => setSort(e.target.value)} name="sort" id="sort" className="h-full pl-2 rounded-md text-gray-600 text-sm">
+          <option value="default">Default</option>
+          <option value="latest">Latest to oldest</option>
+          <option value="oldest">Oldest to newest</option>
+        </select>
+      </div>
+
+      </div>
+      <Reorder.Group values={images} onReorder={handleReorder}>
+        {images.map((image) =>{
         return (
           <Reorder.Item value={image} key={image._id}>
             <Card className="bg-slate-50 hover:bg-slate-100 w-full mb-2 flex gap-5 min-h-24 items-center px-2">
@@ -227,6 +250,13 @@ const ImageList: React.FC<Props> = ({ images, onDeleteSuccess }) => {
         </Dialog>
       )}
 
+<div className="mt-auto">
+  <PaginationComponent 
+  currentPage={currentPage}
+  totalPages={totalPages}
+  onPageChange={(page) => setCurrentPage(page)}
+  />
+</div>
 
 
     </div>

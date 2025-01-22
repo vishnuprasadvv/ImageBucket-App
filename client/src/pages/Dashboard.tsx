@@ -1,4 +1,4 @@
-import { getImages } from '@/api/imageApi'
+import { getFilteredData } from '@/api/imageApi'
 import ImageList from '@/components/ImageList'
 import ImageUpload from '@/components/ImageUpload'
 import React, { useEffect, useState } from 'react'
@@ -11,27 +11,41 @@ interface Image {
 const Dashboard:React.FC = () => {
     const [images, setImages] = useState<Image[]>([])
 
-    const fetchImages = async() => {
-        try {
-            const response = await getImages();
-            setImages(response.data)
-        } catch (error) {
-            console.error('Error fetching images', error)
-        }
-    }
+      const [searchInput, setSearchInput] = useState('')
+      const [sort, setSort] = useState('default')
+      const [currentPage, setCurrentPage] = useState(1)
+      const [totalPages, setTotalPages] = useState(0)
+      const itemsPerPage = 5;
 
-    useEffect(()=> {
-        fetchImages()
-    }, [])
+      const fetchFilteredData = async() => {
+        try {
+          const response = await getFilteredData(searchInput, sort, currentPage, itemsPerPage)
+          setImages(response.data.images)
+          setTotalPages(response.data.totalPages || 0)
+        } catch (error) {
+          console.error('error fetching filtered data', error)
+        }
+      }
+
+     useEffect(() => {
+        fetchFilteredData()
+      }, [searchInput, sort, currentPage])
+
 
 
   return (
     <div className='space-y-5'>
-        <ImageUpload onUploadSuccess={fetchImages} existingImages={images.map((image) => ({order: image.order}))} />
+        <ImageUpload onUploadSuccess={fetchFilteredData} existingImages={images.map((image) => ({order: image.order}))} />
         <ImageList 
+
         images={images}
-        onDeleteSuccess={fetchImages}
-        onRearrangeSuccess={(fetchImages)}
+        totalPages={totalPages}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+        setImages={setImages}
+        setSort={setSort}
+        setSearchInput={setSearchInput}
+        sort={sort}
          />
     </div>
   )

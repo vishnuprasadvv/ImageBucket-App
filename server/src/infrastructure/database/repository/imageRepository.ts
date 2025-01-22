@@ -1,7 +1,27 @@
-import mongoose from "mongoose";
+import mongoose, { SortOrder } from "mongoose";
 import { IImageRepository } from "../../../application/interfaces/IImageRepository";
 import { Image } from "../../../domain/entities/Image";
 import { ImageModel } from "../models/ImageModel";
+
+
+
+
+interface Pagination {
+    page: number;
+    limit: number;
+}
+
+interface Filter {
+    [key: string] : any
+}
+
+interface PaginatedImages {
+    images: Image[];
+    totalImages : number;
+    totalPages: number | null;
+}
+
+
 
 export class ImageRepository implements IImageRepository{
     async getImagesByUser(userId: string): Promise<Image[]> {
@@ -11,6 +31,33 @@ export class ImageRepository implements IImageRepository{
             _id : image._id.toString(),
             userId: image.userId.toString(),
         }))
+    }
+
+    async  getFilteredImagesByUser(userId: string, filter:Filter, sort:Record<string, SortOrder >,  pagination : Pagination  | null ):Promise<PaginatedImages> {
+        const query = ImageModel.find({userId, ...filter}).sort(sort)
+        
+        if(pagination) {
+            const skip = (pagination.page - 1) * pagination.limit;
+            query.skip(skip).limit(pagination.limit)
+        }
+
+        const data = await query.lean().exec()
+        const totalImages = await ImageModel.countDocuments({userId, ...filter})
+        const totalPages = pagination ? Math.ceil ( totalImages / pagination.limit) : null
+
+        const convertedData =  data.map((image) => ({
+            ...image,
+            _id: image._id.toString(),
+            userId: image.userId.toString(),
+        }))
+
+        
+
+        return {
+           images: convertedData, 
+            totalImages ,
+            totalPages
+        }
     }
 
     async addImage(image: Image): Promise<Image> {

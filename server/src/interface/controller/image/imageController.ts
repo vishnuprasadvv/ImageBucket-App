@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { ImageRepository } from "../../../infrastructure/database/repository/imageRepository";
-import { GetImagesUseCase } from "../../../application/use-cases/image/getImageUseCase";
+import { GetFilteredImagesUseCase, GetImagesUseCase } from "../../../application/use-cases/image/getImageUseCase";
 import { ResponseHandler } from "../../../utils/ResponseHandler";
 import { HttpStatusCode } from "../../../enums/HttpStatusCode";
 import { Messages } from "../../../constants/Messages";
@@ -10,7 +10,7 @@ import { EditImageUseCase } from "../../../application/use-cases/image/editImage
 import { UpdateOrderUseCase } from "../../../application/use-cases/image/updateOrderUseCase";
 
 const imageRepository = new ImageRepository();
-export const getImagesController = async (
+export const  getImagesController = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -172,3 +172,26 @@ console.log(updatedImage)
     next(error);
   }
 };
+
+
+export const getFilteredImagesController = async(req:Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user?.id
+    if(!userId) {
+      throw new Error('user ID not found')
+    }
+    const {searchInput='' , sort = '', page = 1 , limit = 5} = req.query;
+    console.log(searchInput, sort, page, limit)
+    const useCase = new GetFilteredImagesUseCase(imageRepository)
+    const result = await useCase.execute(userId, 
+      searchInput.toString(), 
+      sort.toString(), 
+      Number(page), 
+      Number(limit))
+
+      console.log(result)
+    res.status(200).json({success: true, data:result })
+  } catch (error) {
+    next(error)
+  }
+}
